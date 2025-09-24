@@ -1,0 +1,81 @@
+/* Blackboard.css */
+.blackboard-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;              /* fill parent flex space */
+  min-height: 0;        /* allow child to scroll */
+  position: relative;
+  padding: 1.5rem;      /* keep in sync with JS padding read */
+  background: linear-gradient(135deg,#0f172a 0%, #020617 60%, #000000 100%);
+  box-sizing: border-box;
+  overflow: hidden;
+  color: #d1fae5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+}
+
+.blackboard-header {
+  border-bottom: 2px solid rgba(134, 239, 172, 0.18);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #bbf7d0;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.blackboard-writing-area {
+  /* height is set via JS for exact layout */
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(2,6,23,0.45);
+  border: 1px solid rgba(6,78,59,0.6);
+  border-radius: 6px;
+  padding: 1rem;
+  box-sizing: border-box;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  color: #b7f5d9;
+}
+
+/* styled scrollbar */
+.blackboard-writing-area::-webkit-scrollbar { width: 10px; }
+.blackboard-writing-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(#34d399,#10b981);
+  border-radius: 999px;
+}
+.blackboard-writing-area::-webkit-scrollbar-track { background: transparent; }
+
+/* placeholder state */
+.blackboard-placeholder {
+  text-align: center;
+  color: rgba(134,239,172,0.6);
+  margin-top: 3rem;
+}
+
+/* blinking cursor */
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 20px;
+  background: #bbf7d0;
+  margin-left: 6px;
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* chalk holder */
+.chalk {
+  width: 64px;
+  height: 12px;
+  background: linear-gradient(to right,#fef3c7,#fef9c3);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  opacity: 0.9;
+  margin-left: auto;
+  margin-top: 1rem;
+}
