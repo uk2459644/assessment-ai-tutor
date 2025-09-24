@@ -113,7 +113,9 @@ npm run dev
 ---
 
 ## 📌 Hosted Demo
-![View](https://assessment-ai-tutor.vercel.app/)
+👉 [Live Assessment UI on Vercel](https://assessment-ai-tutor.vercel.app/)
+
+---
 
 ## 👨‍💻 Authors
 
