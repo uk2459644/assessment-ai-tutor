@@ -1,5 +1,3 @@
----
-
 # 🎓 AI Tutor – Assessment Project
 
 An interactive **AI-powered tutor** built with **React + TailwindCSS**.
@@ -51,7 +49,7 @@ Students can ask questions in natural language, and the AI tutor:
 ### 1️⃣ Clone the repo
 
 ```bash
-git clone https://github.com/your-repo/ai-tutor.git
+git clone https://github.com/uk2459644/assessment-ai-tutor
 cd ai-tutor
 ```
 
@@ -113,6 +111,9 @@ npm run dev
 * Enhance avatar lip-sync realism.
 
 ---
+
+## 📌 Hosted Demo
+![View](https://assessment-ai-tutor.vercel.app/)
 
 ## 👨‍💻 Authors
 
