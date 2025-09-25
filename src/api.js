@@ -1,6 +1,8 @@
 // src/api.js - frontend
 const BACKEND = import.meta.env.VITE_BACKEND_URL || "https://ai-tutor-server-940j.onrender.com";
 
+// port changed to 4000 in .env
+
 export async function fetchAIAnswer(question) {
   const res = await fetch(`${BACKEND}/api/ask`, {
     method: "POST",
