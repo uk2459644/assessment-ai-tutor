@@ -3,6 +3,8 @@ const BACKEND = import.meta.env.VITE_BACKEND_URL || "https://ai-tutor-server-940
 
 // port changed to 4000 in .env
 
+// D id account changed for free credits
+
 export async function fetchAIAnswer(question) {
   const res = await fetch(`${BACKEND}/api/ask`, {
     method: "POST",
