@@ -3,8 +3,7 @@ import { Avatar } from './components/Avatar.jsx';
 import { Blackboard } from './components/Blackboard.jsx';
 import { InputSection } from './components/InputSection.jsx';
 import { LessonHistory } from './components/LessonHistory.jsx';
-import { fetchAIAnswer, fetchAIAudio } from './api.js'; // import GPT text API
-import { generateTalkingAvatar } from "./didApi.js";
+import { fetchAIAnswer, fetchAIAudio, generateTalkingAvatar } from './api.js';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,97 +18,61 @@ export default function App() {
 
   const [videoUrl, setVideoUrl] = useState(null);
 
-const handleAskQuestion = async (question) => {
-  if (!question) return;
+  const handleAskQuestion = async (question) => {
+    if (!question) return;
 
-  setIsLoading(true);
-  setCurrentAnswer("");
+    setIsLoading(true);
+    setCurrentAnswer("");
 
-  const lessonId = `lesson-${Date.now()}`;
-  setCurrentLessonId(lessonId);
+    const lessonId = `lesson-${Date.now()}`;
+    setCurrentLessonId(lessonId);
 
-  try {
-    // ✅ 1. Call GPT for explanation (critical)
-    const answerText = await fetchAIAnswer(question);
+    let answerText = "";
 
-    const newLesson = {
-      id: lessonId,
-      question,
-      answer: answerText,
-      timestamp: new Date(),
-    };
-    setLessons((prev) => [newLesson, ...prev]);
-
-    // Always show text on blackboard
-    setIsAnimating(true);
-    setCurrentAnswer(answerText);
-  } catch (error) {
-    console.error("❌ GPT error:", error);
-    setCurrentAnswer(
-      "Sorry, I encountered an error fetching the explanation. Please try again."
-    );
-    setIsLoading(false);
-    return; // stop here, don’t try audio/video
-  }
-
-  setIsLoading(false);
-
-  // ✅ 2. Try optional extras (video + audio) independently
-  try {
-    setIsSpaking(true);
-
-    // 🎥 Avatar video
     try {
-      const avatarVideoUrl = await generateTalkingAvatar(currentAnswer);
-      setVideoUrl(avatarVideoUrl);
-    } catch (err) {
-      console.warn("⚠️ Avatar generation failed:", err);
+      // ✅ 1. Call GPT for explanation (critical)
+      answerText = await fetchAIAnswer(question);
+
+      const newLesson = {
+        id: lessonId,
+        question,
+        answer: answerText,
+        timestamp: new Date(),
+      };
+      setLessons((prev) => [newLesson, ...prev]);
+
+      // Always show text on blackboard
+      setIsAnimating(true);
+      setCurrentAnswer(answerText);
+    } catch (error) {
+      console.error("❌ GPT error:", error);
+      setCurrentAnswer(
+        "Sorry, I encountered an error fetching the explanation. Please try again."
+      );
+      setIsLoading(false);
+      return; // stop here, don’t try video
     }
 
-    // 🔊 Audio + lip-sync
+    setIsLoading(false);
+
+    // ✅ 2. Try optional extras (video only)
     try {
-      const audioUrl = await fetchAIAudio(currentAnswer);
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl;
+      setIsSpaking(true);
 
-        const audioContext = new AudioContext();
-        const source = audioContext.createMediaElementSource(audioRef.current);
-        const analyser = audioContext.createAnalyser();
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        analyser.fftSize = 256;
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        const animateMouth = () => {
-          analyser.getByteFrequencyData(dataArray);
-          const avg =
-            dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-          setMouthOpen(avg > 50); // threshold
-          if (!audioRef.current.paused) requestAnimationFrame(animateMouth);
-        };
-
-        audioRef.current.onplay = () => {
-          animateMouth();
-        };
-        audioRef.current.onended = () => {
-          setIsSpaking(false);
-          setMouthOpen(false);
-        };
-
-        audioRef.current.play();
+      // 🎥 Avatar video (handles lipsync internally)
+      try {
+        const avatarVideoUrl = await generateTalkingAvatar(answerText);
+        setVideoUrl(avatarVideoUrl);
+        console.log("✅ Avatar video URL:", avatarVideoUrl);
+      } catch (err) {
+        console.warn("⚠️ Avatar generation failed:", err);
       }
-    } catch (err) {
-      console.warn("⚠️ Audio generation failed:", err);
+    } catch (outerErr) {
+      console.warn("⚠️ Non-critical media error:", outerErr);
+    } finally {
       setIsSpaking(false);
     }
-  } catch (outerErr) {
-    console.warn("⚠️ Non-critical media error:", outerErr);
-    setIsSpaking(false);
-  } finally {
-    // If everything else fails, ensure state resets properly
-    setIsSpaking(false);
-  }
-};
+  };
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-amber-100 to-orange-200">
@@ -156,7 +119,7 @@ const handleAskQuestion = async (question) => {
         />
       </div>
 
-      {/* Hidden audio for future TTS */}
+      {/* Hidden audio for TTS */}
       <audio ref={audioRef} />
     </div>
   );

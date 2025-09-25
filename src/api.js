@@ -1,31 +1,35 @@
-import OpenAI from "openai";
+// src/api.js - frontend
+const BACKEND = import.meta.env.VITE_BACKEND_URL || "https://ai-tutor-server-940j.onrender.com";
 
-const client = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY, // store key in .env
-  dangerouslyAllowBrowser: true // only for demo purposes; do NOT use in production
-});
-
-// Function to get AI answer
 export async function fetchAIAnswer(question) {
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini", // fast + cheaper
-    messages: [
-      { role: "system", content: "You are a friendly AI tutor. Explain topics simply, step by step, with examples." },
-      { role: "user", content: question }
-    ]
+  const res = await fetch(`${BACKEND}/api/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
   });
-
-  return completion.choices[0].message.content;
+  if (!res.ok) throw new Error("Failed to fetch answer");
+  const data = await res.json();
+  return data.answer;
 }
 
-// Generate audio from text
 export async function fetchAIAudio(text) {
-  const response = await client.audio.speech.create({
-    model: "gpt-4o-mini-tts",
-    voice: "alloy", // can also use "verse" or "shimmer"
-    input: text
+  const res = await fetch(`${BACKEND}/api/audio`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
   });
+  if (!res.ok) throw new Error("Failed to fetch audio");
+  const data = await res.json();
+  return data.audio; // data URL
+}
 
-  const buffer = Buffer.from(await response.arrayBuffer());
-  return URL.createObjectURL(new Blob([buffer], { type: "audio/mpeg" }));
+export async function generateTalkingAvatar(text) {
+  const res = await fetch(`${BACKEND}/api/did-talk`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+  if (!res.ok) throw new Error("Failed to create avatar");
+  const data = await res.json();
+  return data.videoUrl;
 }
